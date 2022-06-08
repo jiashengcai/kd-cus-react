@@ -18,6 +18,18 @@
 
 在server.js里，配置允许跨域访问的域名、监听端口、静态资源文件夹（需要对nodejs有了解）
 
+## 开发
+前端项目开发流程：
+
+1、用vscode 打开react_stage 文件夹，加载项目，新建终端运行命令：npm run dev
+
+2、在新建另外一个终端运行命令：node server.js
+
+3、浏览器访问：http://localhost:3001/ 可以看到test,和kingdee 则ok
+
+4、苍穹调试自定义控件： http://localhost:8080/ierp/?formId=pc_main_console&kdcus_cdn=http://localhost:3001
+
+
 ## 打包
 
 每个控件（schemaId）下，都必须要有main.js（webpack打包入口），脚手架里已经给出样例，可以参考
