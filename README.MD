@@ -28,7 +28,8 @@
 3、浏览器访问：http://localhost:3001/ 可以看到test,和kingdee 则ok
 
 4、苍穹调试自定义控件： http://localhost:8080/ierp/?formId=pc_main_console&kdcus_cdn=http://localhost:3001
-
+//也可以使用
+&kdcus_cdn=https://3001-cs-333186817051-default.cs-us-west1-wolo.cloudshell.dev
 
 ## 打包
 
