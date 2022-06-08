@@ -1,0 +1,46 @@
+{
+  "name": "react_stage",
+  "version": "1.0.0",
+  "description": "自定义控件react脚手架",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --config ./build/webpack.dev.config.js",
+    "build": "webpack --config ./build/webpack.prod.config.js"
+  },
+  "author": "liaozejie",
+  "license": "ISC",
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "less": "^3.8.0",
+    "postal": "^2.0.5",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-loadable": "^5.5.0",
+    "react-motion": "^0.5.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "css-loader": "^1.0.0",
+    "express": "^4.17.1",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.11",
+    "filemanager-webpack-plugin": "^2.0.5",
+    "less-loader": "^4.1.0",
+    "nodemon": "^2.0.3",
+    "postcss-loader": "^2.1.6",
+    "serve-index": "^1.9.1",
+    "style-loader": "^0.21.0",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.15.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4",
+    "webpack-merge": "^4.2.2"
+  }
+}
