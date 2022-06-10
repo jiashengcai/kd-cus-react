@@ -6,17 +6,18 @@ import React, {
     useMemo,
 } from "react";
 import SignaturePad from "react-signature-canvas";
-import {Button, Space, Message, Spin, Icon} from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce
+import {Button, Space, Message, Spin, Typography } from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce
 import style from "./SignCanvas.css";
 import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 export default function SignCanvas(props) {
+    const { Text } = Typography
     const {
         operation,
         model,
         data: propsData
     } = props;
-    debugger
+    const [userName, setUserName] = useState('')
     const [loading, setLoading] = useState(false)
     const sigCanvas = useRef({});
     const clear = () => {
@@ -29,6 +30,10 @@ export default function SignCanvas(props) {
         model && model.invoke('save', image)
     }
     useEffect(() => {
+        const {userName } = propsData
+        setUserName(userName)
+    }, [])
+    useEffect(() => {
         //数据更新解除加载中
         if(operation !== "save") return
         setLoading(false)
@@ -40,6 +45,8 @@ export default function SignCanvas(props) {
             <Spin name="Spin" type="page" spinning={loading} style={{height: "100%" }}>
                 <div className={style.signatureCanvasView}>
                     <Space size={"large"}>
+                        <Text>请在下方签名：</Text>
+                        <Text mark>{userName}</Text>
                         <Button onClick={saveImage} type="primary">保存</Button>
                         <Button onClick={clear} type="ghost" className={style.buttonBasicLeft}>清空</Button>
                     </Space>
