@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TodoList from './components/SignCanvas'
+import SignCanvas from './components/SignCanvas'
 import eventBus from '../../../../../../util/eventBus'
 
 /**
@@ -42,11 +42,10 @@ import eventBus from '../../../../../../util/eventBus'
             class Root extends React.Component {
                 constructor(props) {
                     super(props)
-                    debugger
                     this.state = {
                         model: props.model,
-                        operation: props.data.operation,
-                        data: props.data.data
+                        operation: props.customProps.data.operation,
+                        data: props.customProps.data.data
                     }
                 }
                 componentDidMount() {
@@ -54,7 +53,7 @@ import eventBus from '../../../../../../util/eventBus'
                     this.updateSub = eventBus.sub(model, 'update', (updateProps) => {
                         const {
                             data,
-                            operation
+                            operation,
                         } = updateProps.data;
                         const stateObj = {
                             data,
@@ -93,4 +92,4 @@ import eventBus from '../../../../../../util/eventBus'
 
     // 注册自定义组件
     KDApi.register('sign_canvas', MyComponent)
-})(window.KDApi)    
+})(window.KDApi)

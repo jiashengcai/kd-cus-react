@@ -6,37 +6,50 @@ import React, {
     useMemo,
 } from "react";
 import SignaturePad from "react-signature-canvas";
-import Button from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce
-import "./SignCanvas.css";
-
-
+import {Button, Space, Message, Spin, Icon} from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce
+import style from "./SignCanvas.css";
+import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 export default function SignCanvas(props) {
-    const [imageURL, setImageURL] = useState(null);
-    const sigCanvas = useRef({});
-    const clear = () => sigCanvas.current.clear();
-    const save = () => {
-        const image = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png")
-        setImageURL(image);
-        const { model } = this.props
-        model && model.invoke('save', image)
-    }
     const {
         operation,
         model,
         data: propsData
     } = props;
-    const canvasProps = { width: 500, height: 200, className: 'signatureCanvas' }
-    click = (data) => {
-        const { model } = this.props
-        model && model.invoke('save', data)
+    debugger
+    const [loading, setLoading] = useState(false)
+    const sigCanvas = useRef({});
+    const clear = () => {
+        Message.warning('已清除')
+        return sigCanvas.current.clear();
+    };
+    const saveImage = () => {
+        setLoading(true)
+        const image = sigCanvas.current.getTrimmedCanvas().toDataURL("image/png")
+        model && model.invoke('save', image)
     }
+    useEffect(() => {
+        //数据更新解除加载中
+        if(operation !== "save") return
+        setLoading(false)
+        loading && Message.success(propsData.message)
+    }, [propsData,operation])
+    const canvasProps = {className: style.signatureCanvas}
+
     return (<>
-            <Button type="primary">主要按钮</Button>
-            <SignaturePad
-                ref={sigCanvas}
-                canvasProps={canvasProps}
-            />
+            <Spin name="Spin" type="page" spinning={loading} style={{height: "100%" }}>
+                <div className={style.signatureCanvasView}>
+                    <Space size={"large"}>
+                        <Button onClick={saveImage} type="primary">保存</Button>
+                        <Button onClick={clear} type="ghost" className={style.buttonBasicLeft}>清空</Button>
+                    </Space>
+                    <SignaturePad
+                        ref={sigCanvas}
+                        canvasProps={canvasProps}
+                    />
+                </div>
+            </Spin>
+
         </>
     )
 }
