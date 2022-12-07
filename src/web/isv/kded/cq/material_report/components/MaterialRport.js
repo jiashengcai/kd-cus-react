@@ -20,6 +20,7 @@ export default function MaterialRport(props) {
   //数据更新
   useEffect(() => {
     setCosmicPropsData(propsData)
+    console.log(propsData)
   }, [propsData])
   //初始化
   useEffect(() => {
