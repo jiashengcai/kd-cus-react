@@ -5,9 +5,9 @@ import React, {
     useCallback,
     useMemo,
 } from "react";
-import SignaturePad from "react-signature-canvas";
-import {Button, Space, Message, Spin, Typography } from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce
-import style from "./SignCanvas.css";
+import SignaturePad from "react-signature-canvas"; //签名控件
+import {Button, Space, Message, Spin, Typography } from '@kdcloudjs/kdesign'; //https://react.kingdee.design/docs/guide/introduce //第三方基本组件
+import style from "./SignCanvas.css"; //样式
 import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 export default function SignCanvas(props) {

@@ -29,7 +29,7 @@
 
 4、苍穹调试自定义控件： http://localhost:8080/ierp/?formId=pc_main_console&kdcus_cdn=http://localhost:3001
 //也可以使用
-&kdcus_cdn=127.0.0.1:3001
+&kdcus_cdn=http://localhost:3001/
 
 ## 打包
 
