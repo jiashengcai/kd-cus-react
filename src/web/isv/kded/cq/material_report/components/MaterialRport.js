@@ -26,6 +26,7 @@ export default function MaterialRport(props) {
   useEffect(() => {
     setCosmicModel(model)
     const sofaType = propsData.configItems[0].value
+    //根据自定义控件不同的配置项，展示不同的数据内容
     switch (sofaType) {
       case "sofa1": setDataSource(sofa1)
         break
@@ -38,14 +39,11 @@ export default function MaterialRport(props) {
     }
   }, [])
 
+  //展示图文混编数据，dangerouslySetInnerHTML为了解析html类型数据 比如<br>
   const renderTextAndImg = (value) => {
     return (
       <div>
-        <span
-          dangerouslySetInnerHTML={{
-            __html: value.description,
-          }}
-        />
+        <span dangerouslySetInnerHTML={{ __html: value.description, }} />
         <br></br>
         <img src={value.img} alt={value.img} style={{ maxWidth: '140px' }} />
       </div>
@@ -56,7 +54,8 @@ export default function MaterialRport(props) {
     console.log('checkbox checked', value)
   }
 
-  const renderText = (description) => {
+  //在表格中展示选中
+  const renderCheckBox = (description) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', width: '100px' }}>
         <Checkbox.Group onChange={onChange} checkboxType={'default'}>
@@ -71,6 +70,7 @@ export default function MaterialRport(props) {
       </div>
     );
   }
+  // 合并列数据
   const mergeRow = (value, record, rowIndex) => {
     if (rowIndex === 0) {
       return {
@@ -78,7 +78,6 @@ export default function MaterialRport(props) {
         style: { background: '#ffffff' },
       }
     }
-
   }
 
   const sofa1 = [
@@ -112,50 +111,24 @@ export default function MaterialRport(props) {
 
   const columns = [
     { code: 'style', name: '风格', width: 100, align: 'center', features: { autoRowSpan: true, sortable: true, filterable: true } },
-    {
-      code: 'format', name: '规格', width: 200, align: 'left', features: { autoRowSpan: true, sortable: true, filterable: true },
-      render: renderText
-    },
+    { code: 'format', name: '规格', width: 200, align: 'left', features: { autoRowSpan: true, sortable: true, filterable: true }, render: renderCheckBox },
     { code: 'size', name: '尺寸/价格', width: 200, features: { autoRowSpan: true, sortable: true, filterable: true } },
     {
-      name: '2000-3000',
-      align: 'center',
-      code: 'price12',
-      children: [
-        {
-          code: 'price1', name: '', width: 160, align: 'center',
-          render: renderTextAndImg, getCellProps: mergeRow
-        },
-        {
-          code: 'price2', name: '', width: 160, align: 'center',
-          render: renderTextAndImg
-        },
+      name: '2000-3000', align: 'center', code: 'price12', children: [
+        { code: 'price1', name: '', width: 160, align: 'center', render: renderTextAndImg, getCellProps: mergeRow },
+        { code: 'price2', name: '', width: 160, align: 'center', render: renderTextAndImg },
       ],
     },
-
-    {
-      code: 'price3', name: '3000-4000', width: 160, align: 'center',
-      render: renderTextAndImg
-    },
-    {
-      code: 'price4', name: '4000-5000', width: 160, align: 'center',
-      render: renderTextAndImg
-    },
+    { code: 'price3', name: '3000-4000', width: 160, align: 'center', render: renderTextAndImg },
+    { code: 'price4', name: '4000-5000', width: 160, align: 'center', render: renderTextAndImg },
   ]
-
+  //过滤
   const filter = {
-    // defaultFilters: [
-    //   {
-    //     code: 'style',
-    //     filter: '现代简约',
-    //     filterCondition: 'contain'
-    //   }
-    // ],
     onChangeFilters: function (nextFilters) {
       console.log('nextFilters', nextFilters)
     }
   }
-
+  //排序
   const sort = {
     mode: 'single',
     defaultSorts: [{ code: 'order', order: 'asc' }],
@@ -165,8 +138,6 @@ export default function MaterialRport(props) {
       console.log('nextSorts', nextSorts)
     }
   }
-
-
   return (
     <Table style={{ height: '100%', overflow: 'auto' }} className="App"
       useOuterBorder={true}

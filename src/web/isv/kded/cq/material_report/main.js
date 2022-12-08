@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SignCanvas from './components/MaterialRport'
+import MaterialRport from './components/MaterialRport'
 import eventBus from '../../../../../../util/eventBus'
 
 /**
@@ -21,18 +21,14 @@ import eventBus from '../../../../../../util/eventBus'
             this.model = model
         },
         init: function (props) {
-            //console.log('-----init', this.model.style, props)
             setHtml(this.model, props)
         },
         update: function (props) {
-            //console.log('-----update', this.model, props)
             eventBus.pub(this.model, 'update', props)
         },
         commond: function (args) {
-
         },
         destoryed: function () {
-            //console.log('-----destoryed', this.model)
             ReactDOM.unmountComponentAtNode(this.model.dom)
         }
     }
@@ -75,7 +71,7 @@ import eventBus from '../../../../../../util/eventBus'
                         data
                     } = this.state;
                     return (
-                        <SignCanvas
+                        <MaterialRport
                             model={model}
                             data={data}
                         />
