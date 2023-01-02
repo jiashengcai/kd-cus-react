@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import MaterialRport from './components/MaterialRport'
+import PDFRender   from './components/PDFRender'
+import PDF from './components/PDF'
 import eventBus from '../../../../../../util/eventBus'
 
 /**
@@ -34,6 +35,7 @@ import eventBus from '../../../../../../util/eventBus'
     }
 
     var setHtml = function (model, primaryProps) {
+        //,'./img/sofa1.jpg','./img/sofa2.jpg','./img/sofa3.jpg','./img/sofa4.jpg','./img/sofa5.jpg'
         const files = ['./css/index.css']
         KDApi.loadFile(files, model, () => {
             class Root extends React.Component {
@@ -70,7 +72,7 @@ import eventBus from '../../../../../../util/eventBus'
                         data
                     } = this.state;
                     return (
-                        <MaterialRport
+                        <PDFRender 
                             model={model}
                             data={data}
                         />
@@ -82,5 +84,5 @@ import eventBus from '../../../../../../util/eventBus'
     }
 
     // 注册自定义组件
-    KDApi.register('material_report', MyComponent)
+    KDApi.register('signature_online', MyComponent)
 })(window.KDApi)

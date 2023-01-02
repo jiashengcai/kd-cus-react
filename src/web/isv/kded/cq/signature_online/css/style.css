@@ -1,0 +1,54 @@
+.adminPage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.leftBox {
+    width: 300px;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+.fieldsItem  {
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+}
+.fieldTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+.btnWrapper {
+    display: flex;
+    margin-top: 40px;
+}
+
+.pdfBox {
+    max-height: 95vh;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.pdfCol {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: #f7ecec;
+    flex-direction: column;
+}
+
+.pdfCol .canvasBox {
+    position: relative;
+}
+
+
+.pdfCol .canvas {
+    margin-bottom: 10px;
+    border: 1px solid #333;
+}
