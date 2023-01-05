@@ -2,22 +2,39 @@ import React, { useLayoutEffect, useState, useEffect } from "react";
 import SealItem from './SealItem';
 import { loadPDF } from '../common/canvas'
 import styles from '../css/style.css';
-import { Button, Spin, Icon, Tooltip } from '@kdcloudjs/kdesign'; //第三方基本组件
+import { Button, Spin, Icon, Tooltip, Message } from '@kdcloudjs/kdesign'; //第三方基本组件
 import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 
 
 
-const PDFRender = () => {
+const PDFRender = (props) => {
+  const sealWidth = 225
+  const sealHeight = 85
+  const {
+    model,
+    data: propsData
+  } = props;
   const map = new Map();
   const [isLoading, setIsLoading] = useState(false);
   const [isMove, setIsMove] = useState(false);
   const [res, setRes] = useState()
-  const [signatoryDialogData, setSignatoryDialogData] = useState(map)
+  const [signatoryDialogData, setSignatoryDialogData] = useState([])
 
+
+  useEffect(() => {
+    console.log(propsData)
+    if('signPdf' === propsData.data.op){
+      if(true===propsData.data.success ){
+        Message.success('绘制Pdf成功，准备签名')
+      }else{
+        Message.error(propsData.data.error);
+      }
+    }
+  }, [propsData])
 
   useLayoutEffect(() => {
-    const fileSrc = 'http://172.20.182.97/ierp/attachment/preview.do?path=http%3A%2F%2F172.20.182.97%2Fierp%2Ftempfile%2Fdownload.do%3FconfigKey%3Dredis.serversForCache%26id%3Dtempfile-9eb28016-cc6a-4660-8d32-246cfedad459&isFromCache=true&appId=kded_metadata&fId=kded_pdf_viewer&pageId=84d44a9bfcf54170a21b08e5d858c6e0&kd_cs_ticket=YVxH7VtXa18kI9bcMoxX2GEMpnS6Ap0G#toolbar=0';
+    const fileSrc = propsData.data.pdfUrl;
     setIsLoading(true)
     loadPDF({ el: "pdf-viewer", fileSrc: fileSrc }, res => {
       setIsLoading(false)
@@ -58,7 +75,7 @@ const PDFRender = () => {
 
       div.addEventListener("mouseup", ev => {
         let id = navigator.userAgent.indexOf("Firefox") > -1 ? ev.originalTarget.id : ev.toElement.id;
-        if(id.startsWith('sealItem')){
+        if (id.startsWith('sealItem')) {
           signatoryMouseUp({
             x: document.getElementById(id).style.left,
             y: document.getElementById(id).style.top,
@@ -81,10 +98,10 @@ const PDFRender = () => {
   const getSealAttr = () => {
     let text = "个人";
     return {
-      offsetLeft: 113,
-      offsetTop: 43,
-      width: 225,
-      height: 85,
+      offsetLeft: sealWidth / 2,
+      offsetTop: sealHeight / 2,
+      width: sealWidth,
+      height: sealHeight,
       innerText: `${text}签章`
     };
   }
@@ -115,29 +132,36 @@ const PDFRender = () => {
       offsetLeft, offsetTop, innerText
     } = getSealAttr();
     const canvasIndex = obj.i + 1
-    let item = signatoryDialogData.get(canvasIndex)
+    let item = signatoryDialogData.find(o => o.pageIndex === canvasIndex);
+
+    //let item = signatoryDialogData.get(canvasIndex)
     let isExist = item !== undefined && item !== null;
 
     if (isExist) { // 原先已经存在的
       //更新坐标
-      item['point'] = {
-        x: Math.round((Number(obj.x.substring(0, obj.x.length - 2)) + offsetLeft) / item.scale),
-        y: Math.round((Number(obj.y.substring(0, obj.y.length - 2)) + offsetTop) / item.scale)
-      }
-      setSignatoryDialogData(signatoryDialogData.set(canvasIndex, item));
+      const updateSignatoryDialogData = signatoryDialogData.map(item => {
+        if (item.pageIndex === canvasIndex) {
+          return {
+            ...item, x: Math.round((Number(obj.x.substring(0, obj.x.length - 2)) + offsetLeft) / item.scale),
+            y: Math.round((Number(obj.y.substring(0, obj.y.length - 2)) + offsetTop) / item.scale)
+          };
+        }
+        return item;
+      });
+      setSignatoryDialogData(updateSignatoryDialogData);
     } else {
       //新建每页只放置1个签章，
       let index = 1;
-      setSignatoryDialogData(signatoryDialogData.set(obj.canvasIndex, {
-        point: {
-          x: Number(obj.x.substring(0, obj.x.length - 2)) + offsetLeft,
-          y: Number(obj.y.substring(0, obj.y.length - 2)) + offsetTop
-        },
+      setSignatoryDialogData(signatoryDialogData.concat({
+        x: Number(obj.x.substring(0, obj.x.length - 2)) + offsetLeft,
+        y: Number(obj.y.substring(0, obj.y.length - 2)) + offsetTop,
         allPage: obj.res.allPage,
         scale: obj.res.scale,
-        innerDivId: obj.elementd,
+        sealWidth: sealWidth,
+        sealHeight: sealHeight,
+        signatureFieldName: obj.elementd,
         innerText: `${innerText}${index}`,
-        canvasIndex: obj.i + 1
+        pageIndex: obj.i + 1
       }));
     }
   }
@@ -174,7 +198,7 @@ const PDFRender = () => {
   }
 
   const createDiv = (obj) => {
-     let innerDiv = document.createElement("div");
+    let innerDiv = document.createElement("div");
     // innerDiv.className = "seal-item";
     // innerDiv.setAttribute('style', 'position: absolute;display: flex;align-items: center;justify-content: center;color: #666;font-size: 14px;border: 1px dashed #666;background-color: rgba(235, 247, 254, .8);cursor: move;text-align: center;');
     innerDiv.id = `content${obj.id}`;
@@ -187,8 +211,18 @@ const PDFRender = () => {
     ReactDOM.render(<SealItem {...obj} />, document.getElementById(`content${obj.id}`));
   }
 
-  const createSignatory = (obj) => {
-
+  const signPdf = () => {
+    if (signatoryDialogData.length == 0) {
+      Message.warning('请先放置签名图形')
+    }else {
+      let result = {
+        pdfUrl: propsData.data.pdfUrl,
+        rate: window.devicePixelRatio,
+        signPoint: signatoryDialogData,
+      }
+      model.invoke('signPdf', result)
+    }
+   
   }
 
   return (
@@ -208,7 +242,7 @@ const PDFRender = () => {
             <Button size='large' >
               取消
             </Button>
-            <Button style={{width: '100%', marginLeft: '5px'}}  type="primary" size='large'>
+            <Button onClick={signPdf} style={{ width: '100%', marginLeft: '5px' }} type="primary" size='large'>
               确定签名
             </Button>
           </div>

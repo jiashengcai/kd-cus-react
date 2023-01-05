@@ -3,87 +3,96 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 import '../css/style.css'
 
-const devicePixelRatio = window.devicePixelRatio;
+
 
 /**
  * 加载PDF文件
  * @param el 页面中存放canvas的div的id或者类名
  * @param fileSrc 后端返回的PDF文件路径
- * @param scale PDF缩放的倍数，项目中，我设置了默认值是1.35
+ * @param scale PDF缩放的倍数
  * @param call 加载成功后的回调函数
  * @returns {Promise<void>}
  */
 export async function loadPDF({
-  el, fileSrc, scale = 1.35
+  el, fileSrc, scale = 1
 }, call) {
   let pdfCol = document.getElementById(el);
 
   // let loadingTask = await window.pdfjsLib.getDocument(fileSrc);
   //{url:fileSrc,cMapUrl:"https://unpkg.zhimg.com/pdfjs-dist@3.1.81/cmaps/",cMapPacked: true}
-  let loadingTask = await pdfjsLib.getDocument({url:fileSrc}); // 创建加载任务
+  let loadingTask = await pdfjsLib.getDocument({ url: fileSrc }); // 创建加载任务
 
   loadingTask.promise.then(function (pdf) { // 开始加载任务
-      for (let i = 1; i <= pdf.numPages; i++) { // 遍历每一页PDF
-          pdf.getPage(i).then(async function (page) {
-              let viewPort = page.getViewport({scale: scale * devicePixelRatio}); // 获取PDF尺寸
-
-              let div = document.createElement("div"); // 用于存放canvas
-
-
-              div.id = `canvasBox_${i}`;
-              div.className = 'canvasBox';
-              div.setAttribute('style', 'position: relative;');
+    for (let i = 1; i <= pdf.numPages; i++) { // 遍历每一页PDF
+      pdf.getPage(i).then(async function (page) {
+        let rate = window.devicePixelRatio || 1
+        rate = (rate === 1) ? 1.5 : rate
+        let viewPort = page.getViewport({ scale: scale }); // 获取PDF尺寸
+        let div = document.createElement("div"); // 用于存放canvas
 
 
-              let canvas = document.createElement("canvas");  // 创建canvas
+        div.id = `canvasBox_${i}`;
+        div.className = 'canvasBox';
+        div.setAttribute('style', 'position: relative;');
 
-              let context = canvas.getContext("2d");
 
-              // 将canvas的宽和高设置为与PDF视图一样大小
-              canvas.height = viewPort.height;
-              canvas.width = viewPort.width;
+        let canvas = document.createElement("canvas");  // 创建canvas
+        let context = canvas.getContext("2d");
 
-              setTimeout(() => {
-                  // 画页码
-                  context.font = "14px orbitron";
-                  context.fillStyle = "#333";
-                  context.save();
-                  context.beginPath();
-                  context.line = 2;
-                  context.textAlign = "center";
-                  context.textBaseline = "middle";
-                  context.fillText(`${i}`, viewPort.width / 2, viewPort.height - 30);
-                  context.restore();
-                  context.closePath();
-              }, 500);
 
-              let renderContext = {
-                  canvasContext: context,
-                  viewport: viewPort
-              };
+        // 将canvas的宽和高设置为与PDF视图一样大小
+        // canvas.height = viewPort.height ;
+        // canvas.width =  viewPort.width;
+        canvas.width = Math.floor(viewPort.width * rate);
+        canvas.height = Math.floor(viewPort.height * rate);
+        canvas.style.width = Math.floor(viewPort.width) + 'px';
+        canvas.style.height = Math.floor(viewPort.height) + 'px';
+        // 缩放绘图
+        setTimeout(() => {
+          // 画页码
+          context.font = "14px orbitron";
+          context.fillStyle = "#333";
+          context.save();
+          context.beginPath();
+          context.line = 2;
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(`${i}`, viewPort.width / 2, viewPort.height - 30);
+          context.restore();
+          context.closePath();
+        }, 500);
+        let transform = rate !== 1
+          ? [rate, 0, 0, rate, 0, 0]
+          : null;
 
-              // 该函数返回一个 当PDF页面成功渲染到界面上时解析的`promise`，我们可以使用成功回调来渲染文本图层。
-              await page.render(renderContext); // 初始化文本图层
-              //canvas.className = 'canvas';
-              canvas.setAttribute('style', 'margin-bottom: 10px;');
-              canvas.id = `canvas_${i}`;
+        let renderContext = {
+          canvasContext: context,
+          viewport: viewPort,
+          transform: transform
+        };
 
-              call({
-                  pdfCol: pdfCol,
-                  canvas: canvas,
-                  context: context,
-                  scale: scale,
-                  index: i,
-                  allPage: pdf.numPages
-              });
+        // 该函数返回一个 当PDF页面成功渲染到界面上时解析的`promise`，我们可以使用成功回调来渲染文本图层。
+        await page.render(renderContext); // 初始化文本图层
+        //canvas.className = 'canvas';
+        canvas.setAttribute('style', 'margin-bottom: 10px;');
+        canvas.id = `canvas_${i}`;
 
-              div.appendChild(canvas); // 将canvas放进对应的div中
-              pdfCol.appendChild(div); // 将每一个div放到外面的大盒子中
+        call({
+          pdfCol: pdfCol,
+          canvas: canvas,
+          context: context,
+          scale: scale,
+          index: i,
+          allPage: pdf.numPages
+        });
 
-          });
-      }
+        pdfCol.appendChild(div); // 将每一个div放到外面的大盒子中
+        div.appendChild(canvas);
+      });
+    }
   });
 }
+
 
 /**
  * 获取canvas鼠标的点坐标
@@ -98,7 +107,7 @@ export function getMousePos(canvas, event) {
 
   let y = Math.round(event.clientY - rect.top);
 
-  return {x, y};
+  return { x, y };
 }
 
 /**

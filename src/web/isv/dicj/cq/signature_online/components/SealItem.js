@@ -4,19 +4,6 @@ import styles from '../css/sealitem.css';
 
 const SealItem = (props) => {
   const { id, width, height, left, top, innerText, parentDiv } = props;
-  //  let innerDiv = document.createElement("div");
-  //   innerDiv.className = "seal-item";
-  //   innerDiv.setAttribute(
-  //     'style',
-  //     'position: absolute;display: flex;align-items: center;justify-content: center;color: #666;font-size: 14px;border: 1px dashed #666;background-color: rgba(235, 247, 254, .8);cursor: move;text-align: center;',
-  //   );
-  //   innerDiv.id = id;
-  //   innerDiv.style.width = width;
-  //   innerDiv.style.height = height;
-  //   innerDiv.style.left = left;
-  //   innerDiv.style.top = top;
-  //   innerDiv.innerText = innerText;
-  //   parentDiv.appendChild(innerDiv);
   const remvoeItem = () => {
     const element = document.getElementById(`content${id}`);
     element.remove();

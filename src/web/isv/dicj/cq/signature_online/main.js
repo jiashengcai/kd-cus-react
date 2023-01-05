@@ -49,17 +49,9 @@ import eventBus from '../../../../../../util/eventBus'
                 componentDidMount() {
                     const { model } = this.state
                     this.updateSub = eventBus.sub(model, 'update', (updateProps) => {
-                        const {
-                            data,
-                        } = updateProps.data;
                         const stateObj = {
-                            data,
+                            data:updateProps,
                         };
-                        Object.keys(stateObj).forEach((key) => {
-                            if (!stateObj[key]) {
-                                delete stateObj[key];
-                            }
-                        });
                         this.setState(stateObj);
                     })
                 }
