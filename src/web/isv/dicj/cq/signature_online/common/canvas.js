@@ -47,20 +47,19 @@ export async function loadPDF({
         canvas.height = Math.floor(viewPort.height * rate);
         canvas.style.width = Math.floor(viewPort.width) + 'px';
         canvas.style.height = Math.floor(viewPort.height) + 'px';
-        // 缩放绘图
-        setTimeout(() => {
-          // 画页码
-          context.font = "14px orbitron";
-          context.fillStyle = "#333";
-          context.save();
-          context.beginPath();
-          context.line = 2;
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-          context.fillText(`${i}`, viewPort.width / 2, viewPort.height - 30);
-          context.restore();
-          context.closePath();
-        }, 500);
+        // setTimeout(() => {
+        //   // 画页码
+        //   context.font = "14px orbitron";
+        //   context.fillStyle = "#333";
+        //   context.save();
+        //   context.beginPath();
+        //   context.line = 2;
+        //   context.textAlign = "center";
+        //   context.textBaseline = "middle";
+        //   context.fillText(`${i}`, viewPort.width / 2, viewPort.height - 30);
+        //   context.restore();
+        //   context.closePath();
+        // }, 500);
         let transform = rate !== 1
           ? [rate, 0, 0, rate, 0, 0]
           : null;

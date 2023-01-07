@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState, useEffect } from "react";
 import SealItem from './SealItem';
 import { loadPDF } from '../common/canvas'
 import styles from '../css/style.css';
-import { Button, Spin, Icon, Tooltip, Message } from '@kdcloudjs/kdesign'; //第三方基本组件
+import { Button, Spin, Icon, Tooltip, Message, Input, Form } from '@kdcloudjs/kdesign'; //第三方基本组件
 import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 
@@ -15,7 +15,6 @@ const PDFRender = (props) => {
     model,
     data: propsData
   } = props;
-  const map = new Map();
   const [isLoading, setIsLoading] = useState(false);
   const [isMove, setIsMove] = useState(false);
   const [res, setRes] = useState()
@@ -23,11 +22,14 @@ const PDFRender = (props) => {
 
 
   useEffect(() => {
-    console.log(propsData)
-    if('signPdf' === propsData.data.op){
-      if(true===propsData.data.success ){
+    if ('signPdf' === propsData.data.op) {
+      if (true === propsData.data.success && propsData.data.loginEsignUrl !== '') {
         Message.success('绘制Pdf成功，准备签名')
-      }else{
+        console.log(propsData.data.loginEsignUrl)
+        const l=(screen.availWidth-800)/2;
+        const t=(screen.availHeight-650)/2;
+        window.parent.window.open(propsData.data.loginEsignUrl,'eSignCloud OAuth','width=800,height=650,top='+t+',left='+l+',toolbar=no,menubar=no,location=no,status=yes');
+      } else {
         Message.error(propsData.data.error);
       }
     }
@@ -75,7 +77,7 @@ const PDFRender = (props) => {
 
       div.addEventListener("mouseup", ev => {
         let id = navigator.userAgent.indexOf("Firefox") > -1 ? ev.originalTarget.id : ev.toElement.id;
-        if (id.startsWith('sealItem')) {
+        if (id.startsWith(propsData.data.userName)) {
           signatoryMouseUp({
             x: document.getElementById(id).style.left,
             y: document.getElementById(id).style.top,
@@ -109,13 +111,13 @@ const PDFRender = (props) => {
   // 签章模式下 鼠标按下的回调
   const signatoryMouseDown = (obj) => {
     const canvasIndex = obj.i + 1
-    if (!document.getElementById(`sealItem_${canvasIndex}`)) {
+    if (!document.getElementById(`${propsData.data.userName}_${canvasIndex}`)) {
       let {
         offsetLeft, offsetTop, width, height, innerText
       } = getSealAttr();
 
       createDiv({
-        id: `sealItem_${canvasIndex}`,
+        id: `${propsData.data.userName}_${canvasIndex}`,
         width: `${width}px`,
         height: `${height}px`,
         left: `${obj.x - offsetLeft}px`,
@@ -199,14 +201,7 @@ const PDFRender = (props) => {
 
   const createDiv = (obj) => {
     let innerDiv = document.createElement("div");
-    // innerDiv.className = "seal-item";
-    // innerDiv.setAttribute('style', 'position: absolute;display: flex;align-items: center;justify-content: center;color: #666;font-size: 14px;border: 1px dashed #666;background-color: rgba(235, 247, 254, .8);cursor: move;text-align: center;');
     innerDiv.id = `content${obj.id}`;
-    // innerDiv.style.width = obj.width;
-    // innerDiv.style.height = obj.height;
-    // innerDiv.style.left = obj.left;
-    // innerDiv.style.top = obj.top;
-    // innerDiv.innerText = obj.innerText;
     obj.parentDiv.appendChild(innerDiv);
     ReactDOM.render(<SealItem {...obj} />, document.getElementById(`content${obj.id}`));
   }
@@ -214,15 +209,18 @@ const PDFRender = (props) => {
   const signPdf = () => {
     if (signatoryDialogData.length == 0) {
       Message.warning('请先放置签名图形')
-    }else {
+    } else {
       let result = {
         pdfUrl: propsData.data.pdfUrl,
         rate: window.devicePixelRatio,
         signPoint: signatoryDialogData,
+        esignName: propsData.data.esignName,
+        pageId: propsData.data.pageId
       }
+      setIsLoading(true)
       model.invoke('signPdf', result)
     }
-   
+
   }
 
   return (
@@ -239,15 +237,25 @@ const PDFRender = (props) => {
             </Tooltip>
           </div>
           <div className={styles.btnWrapper}>
-            <Button size='large' >
+            {/* <Button size='large' >
               取消
-            </Button>
-            <Button onClick={signPdf} style={{ width: '100%', marginLeft: '5px' }} type="primary" size='large'>
-              确定签名
-            </Button>
+            </Button> */}
+            <Form
+              layout="vertical">
+              <Form.Item
+                label="eSign用户名"
+                name="username"
+                required
+                validateTrigger="onBlur">
+                <Input defaultValue={propsData.data.esignName} />
+              </Form.Item>
+              <Button loading={isLoading} htmlType="submit" onClick={signPdf} style={{ width: '100%', marginLeft: '5px' }} type="primary" size='large'>
+                确定签名
+              </Button>
+            </Form>
           </div>
         </div>
-        <Spin name="Spin" type="container" spinning={isLoading}>
+        <Spin name="Spin" type="page" spinning={isLoading}>
           <div className={styles.pdfBox} >
             <div className={styles.pdfCol} id='pdf-viewer' />
           </div>
