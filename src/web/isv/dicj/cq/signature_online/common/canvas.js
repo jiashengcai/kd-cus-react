@@ -14,7 +14,7 @@ import '../css/style.css'
  * @returns {Promise<void>}
  */
 export async function loadPDF({
-  el, fileSrc, scale = 1
+  el, fileSrc, rate
 }, call) {
   let pdfCol = document.getElementById(el);
 
@@ -25,9 +25,8 @@ export async function loadPDF({
   loadingTask.promise.then(function (pdf) { // 开始加载任务
     for (let i = 1; i <= pdf.numPages; i++) { // 遍历每一页PDF
       pdf.getPage(i).then(async function (page) {
-        let rate = window.devicePixelRatio || 1
-        rate = (rate === 1) ? 1.5 : rate
-        let viewPort = page.getViewport({ scale: scale }); // 获取PDF尺寸
+        
+        let viewPort = page.getViewport({ scale: 1 }); // 获取PDF尺寸
         let div = document.createElement("div"); // 用于存放canvas
 
 
@@ -80,7 +79,7 @@ export async function loadPDF({
           pdfCol: pdfCol,
           canvas: canvas,
           context: context,
-          scale: scale,
+          scale: rate,
           index: i,
           allPage: pdf.numPages
         });

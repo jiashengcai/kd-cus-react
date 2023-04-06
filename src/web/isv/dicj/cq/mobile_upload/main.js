@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import PDFRender   from './components/PDFRender'
-import PDF from './components/PDF'
 import eventBus from '../../../../../../util/eventBus'
+import Root from './App'
 
 /**
  * 在setHtml中声明Root类，使用ReactDOM.render将其渲染在model.dom中
@@ -36,45 +35,12 @@ import eventBus from '../../../../../../util/eventBus'
 
     var setHtml = function (model, primaryProps) {
         //,'./img/sofa1.jpg','./img/sofa2.jpg','./img/sofa3.jpg','./img/sofa4.jpg','./img/sofa5.jpg'
-        const files = ['./css/index.css','./cmaps/test.font']
+        const files = ['./css/index.css','./css/style.css','./css/css-vars-patch.css']
         KDApi.loadFile(files, model, () => {
-            class Root extends React.Component {
-                constructor(props) {
-                    super(props)
-                    this.state = {
-                        model: props.model,
-                        data: props.customProps
-                    }
-                }
-                componentDidMount() {
-                    const { model } = this.state
-                    this.updateSub = eventBus.sub(model, 'update', (updateProps) => {
-                        const stateObj = {
-                            data:updateProps,
-                        };
-                        this.setState(stateObj);
-                    })
-                }
-                componentWillUnmount() {
-                    eventBus.unsub(this.updateSub)
-                }
-                render() {
-                    const {
-                        model,
-                        data
-                    } = this.state;
-                    return (
-                        <PDFRender
-                            model={model}
-                            data={data}
-                        />
-                    )
-                }
-            }
             ReactDOM.render(<Root model={model} customProps={primaryProps} />, model.dom)
         })
     }
 
     // 注册自定义组件
-    KDApi.register('signature_online', MyComponent)
+    KDApi.register('mobile_upload', MyComponent)
 })(window.KDApi)

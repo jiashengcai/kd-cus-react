@@ -15,6 +15,8 @@ const PDFRender = (props) => {
     model,
     data: propsData
   } = props;
+
+  const [rate, setRate] = useState(1.5);
   const [isLoading, setIsLoading] = useState(false);
   const [isMove, setIsMove] = useState(false);
   const [res, setRes] = useState()
@@ -38,7 +40,10 @@ const PDFRender = (props) => {
   useLayoutEffect(() => {
     const fileSrc = propsData.data.pdfUrl;
     setIsLoading(true)
-    loadPDF({ el: "pdf-viewer", fileSrc: fileSrc }, res => {
+    let rate2 = window.devicePixelRatio || 1
+    rate2 = (rate2 === 1 || rate2 > 1.35) ? 1.35 : rate2
+    setRate(rate2)
+    loadPDF({ el: "pdf-viewer", fileSrc: fileSrc, rate: rate2 }, res => {
       setIsLoading(false)
       if (Number(res.allPage) === Number(res.index)) { // 最后一张PDF渲染完成
         setRes(res)
@@ -212,7 +217,7 @@ const PDFRender = (props) => {
     } else {
       let result = {
         pdfUrl: propsData.data.pdfUrl,
-        rate: window.devicePixelRatio,
+        rate: rate,
         signPoint: signatoryDialogData,
         esignName: propsData.data.esignName,
         pageId: propsData.data.pageId

@@ -41,7 +41,21 @@ module.exports = {
             test:/\.(png|svg|jpg|gif|woff|woff2|svg|eot|ttf)$/,
             loader: 'url-loader?limit=1024&name=[path][name].[ext]'
         },{
-            test:/\.(css|less)$/,
+            test: /\.less$/,
+            loader: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: [{
+                    loader: 'css-loader',
+                    options: {
+                      sourceMap: true,
+                      importLoaders: true,
+                      modules: true
+                    }
+                },'less-loader']
+            })
+        },{
+            test: /\.css$/,
+            //exclude: /node_modules/,
             loader: ExtractTextPlugin.extract({
                 fallback: "style-loader",
                 use: [{
