@@ -12,25 +12,34 @@ export default (props) => {
     } = props;
     const [fileList, setFileList] = useState([]);
     const [files, setFiles] = useState([]);
-    const [maxCount, setMaxCount] = useState(99);
+    const [showUpload, setShowUpload] = useState(true);
+    const [deletable, setDeletable] = useState(true);
     useEffect(() => {
-        if (propsData !== null && propsData.data.length > 0) {
+        if (!propsData.data.edite) {
             return
         }
         let button = document.getElementById('tbmain');
+        if (button === null) {
+            button = document.getElementById('dicj_mtoolbarap');
+        }
         const handleClick = () => {
             //TODO 推送苍穹
         };
-        button.addEventListener('click', handleClick);
+        button.addEventListener('click', handleClick,{ passive: false });
         return () => {
             button.removeEventListener('click', handleClick);
         };
     }, [files]);
     useEffect(() => {
-        if (propsData !== null && propsData.data.length > 0) {
-            setFiles(propsData.data)
-            setMaxCount(propsData.data.length)
+        if (propsData !== null && propsData.data.images.length > 0) {
+            setFiles(propsData.data.images)
         }
+        //是否可编辑
+        if (propsData !== null && propsData.data.edite !== undefined) {
+            setDeletable(propsData.data.edite)
+            setShowUpload(propsData.data.edite)
+        }
+
     }, [propsData]);
 
 
@@ -69,8 +78,11 @@ export default (props) => {
                 accept="image/jpeg,image/jpg,image/png"
                 upload={onFileUpload}
                 onChange={setFiles}
-                onDelete={onFileDelete}
-                maxCount={maxCount}
+                //onDelete={onFileDelete}
+                //maxCount={maxCount}
+                deletable={deletable}
+                showUpload = {showUpload}
+                //preview={true}
             >
                 {/* <div
                     style={{
