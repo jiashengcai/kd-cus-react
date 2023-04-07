@@ -12,7 +12,6 @@ class Root extends React.Component {
         }
     }
     componentDidMount() {
-        debugger
         const { model } = this.state
         this.updateSub = eventBus.sub(model, 'update', (updateProps) => {
             const stateObj = {
@@ -22,11 +21,9 @@ class Root extends React.Component {
         })
     }
     componentWillUnmount() {
-        debugger
         eventBus.unsub(this.updateSub)
     }
     render() {
-        debugger
         const {
             model,
             data
