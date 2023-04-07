@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { ImageUploader } from 'antd-mobile'
+import { ImageUploader,Dialog } from 'antd-mobile'
+import { CloseCircleFill } from 'antd-mobile-icons'
+import './index.less';
 
 
 
@@ -7,61 +9,74 @@ import { ImageUploader } from 'antd-mobile'
 
 export default (props) => {
     const {
-        model,
-        data: propsData
+        model
     } = props;
-    const [fileList, setFileList] = useState([]);
+    const [propsData, setPropsData] = useState(props.data);
+
     const [files, setFiles] = useState([]);
+    //是否可以上传
     const [showUpload, setShowUpload] = useState(true);
+    //是否可以删除
     const [deletable, setDeletable] = useState(true);
     useEffect(() => {
-        if (!propsData.data.edite) {
-            return
-        }
-        let button = document.getElementById('tbmain');
-        if (button === null) {
-            button = document.getElementById('dicj_mtoolbarap');
-        }
-        const handleClick = () => {
-            //TODO 推送苍穹
-        };
-        button.addEventListener('click', handleClick,{ passive: false });
-        return () => {
-            button.removeEventListener('click', handleClick);
-        };
-    }, [files]);
-    useEffect(() => {
-        if (propsData !== null && propsData.data.images.length > 0) {
+        if (propsData?.data != null && propsData.data.images.length > 0) {
             setFiles(propsData.data.images)
         }
         //是否可编辑
-        if (propsData !== null && propsData.data.edite !== undefined) {
+        if (propsData?.data != null && propsData.data.edite !== undefined) {
             setDeletable(propsData.data.edite)
             setShowUpload(propsData.data.edite)
         }
+    }, [propsData]);    
 
-    }, [propsData]);
-
-
-
-
+    /**
+     * 
+     * @param {手动上传的文件} file 
+     * @returns 
+     */
     const onFileUpload = async (file) => {
-        const thumbnailUrl = URL.createObjectURL(file);
-        return {
-            extra: file.name,
-            key: thumbnailUrl,
-            url: thumbnailUrl,
-        };
+        const fileName = file.name;
+        const name = fileName.substring(0, fileName.lastIndexOf('.')) + ".gif";
+        var renameFile = new File([file], name, { type: file.type });
+        const formData = new FormData();
+        formData.append('file', renameFile);
+        formData.append('suffix', '.gif');
+        // 上传图片到文件服务器
+        const response = await fetch('attachment/upload.do', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            const data = await response.json();
+            const fileInfo = {
+                extra: name,
+                size: file.size,
+                key: data.url,
+                url: "attachment/download.do?path="+data.url,
+                fileType: 'gif',
+                newFile: file.newFile == false ? false : true
+            }
+            //文件信息保存到单据
+            model.invoke('saveImages', { images: [fileInfo], date:new Date() });
+            return fileInfo
+        } else {
+            // 处理上传失败后的逻辑
+        }
     };
-    const onChangeFile = (file) => {
-        const attachments = [...files, { extra: file[0].extra, key: file[0].key, url: file[0].name }];
-        setFiles(attachments);
-    }
+
     // 移除图片
     const onFileDelete = async (file) => {
         const attachments = files.filter((item) => item.url !== file.url);
         setFiles(attachments);
+        model.invoke('deleteImages', { file: file.fileUid, date:new Date() });
     };
+    const renderDeleteIcon = () => {
+        return (
+            <CloseCircleFill style={{ color: '#9999', fontSize: 16, marginLeft: '8px', marginTop: '-8px' }}
+            />
+        );
+    };
+
 
 
 
@@ -78,32 +93,27 @@ export default (props) => {
                 accept="image/jpeg,image/jpg,image/png"
                 upload={onFileUpload}
                 onChange={setFiles}
-                //onDelete={onFileDelete}
-                //maxCount={maxCount}
                 deletable={deletable}
-                showUpload = {showUpload}
-                //preview={true}
+                onDelete={onFileDelete}
+                showUpload={showUpload}
+                deleteIcon={renderDeleteIcon()}
             >
-                {/* <div
+                <div
                     style={{
-                        height: 80,
                         width: 80,
+                        height: 80,
+                        backgroundColor: '#f5f5f5',
                         display: 'flex',
-                        flexDirection: 'column',
+                        flexDirection: 'xx',
+                        justifyContent: 'center',
                         alignItems: 'center',
-                        justifyContent: 'space-evenly'
+                        color: '#999999',
+                        backgroundImage: 'url(isv/dicj/avatar_filebutton/avatar_filebutton/img/upload.png)',
+                        backgroundSize: 'cover'
+
                     }}
                 >
-                <Icon type="add" ></Icon>
-                   <div style={{
-                    fonSize: 14,
-                    color: '#999999',
-                    letterSpacing: 0,
-                    textAlign: 'center',
-                    lineHeight: 16,
-                    fontWeight: 400,
-                   }}>點擊上傳</div>
-                </div> */}
+                </div>
 
             </ImageUploader>
 

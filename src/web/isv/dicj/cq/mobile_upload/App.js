@@ -1,8 +1,6 @@
 import React from 'react'
-import 'antd-mobile/es/global';
 import Index from './components/Index'
 import eventBus from '../../../../../../util/eventBus'
-import '@kdcloudjs/kdesign/dist/kdesign.css'
 
 
 class Root extends React.Component {
@@ -14,6 +12,7 @@ class Root extends React.Component {
         }
     }
     componentDidMount() {
+        debugger
         const { model } = this.state
         this.updateSub = eventBus.sub(model, 'update', (updateProps) => {
             const stateObj = {
@@ -23,9 +22,11 @@ class Root extends React.Component {
         })
     }
     componentWillUnmount() {
+        debugger
         eventBus.unsub(this.updateSub)
     }
     render() {
+        debugger
         const {
             model,
             data
