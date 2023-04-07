@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ImageUploader,Dialog } from 'antd-mobile'
 import { CloseCircleFill } from 'antd-mobile-icons'
+import heic2any from 'heic2any'
 import './index.less';
 
 
@@ -36,33 +37,58 @@ export default (props) => {
      */
     const onFileUpload = async (file) => {
         const fileName = file.name;
-        const name = fileName.substring(0, fileName.lastIndexOf('.')) + ".gif";
-        var renameFile = new File([file], name, { type: file.type });
+        var renameFile = null;
+        if (fileName.toLowerCase().endsWith('.heic')) {
+          try {
+            const resultBlob = await heic2any({
+              blob: file,
+              toType: 'image/jpg',
+            });
+            renameFile = new File([resultBlob], fileName + '.gif', {
+              type: 'image/jpeg',
+              lastModified: new Date().getTime(),
+            });
+          } catch (error) {
+            Toast.hide();
+            return;
+          }
+        }else {
+            const name = fileName.substring(0, fileName.lastIndexOf('.')) + '.gif';
+            var renameFile = new File([file], name, { type: file.type });
+        }
+      
+        
         const formData = new FormData();
         formData.append('file', renameFile);
         formData.append('suffix', '.gif');
         // 上传图片到文件服务器
-        const response = await fetch('attachment/upload.do', {
+        try {
+          const response = await fetch('attachment/upload.do', {
             method: 'POST',
-            body: formData
-        });
-        if (response.ok) {
-            const data = await response.json();
-            const fileInfo = {
-                extra: name,
-                size: file.size,
-                key: data.url,
-                url: "attachment/download.do?path="+data.url,
-                fileType: 'gif',
-                newFile: file.newFile == false ? false : true
-            }
-            //文件信息保存到单据
-            model.invoke('saveImages', { images: [fileInfo], date:new Date() });
-            return fileInfo
-        } else {
-            // 处理上传失败后的逻辑
+            body: formData,
+          });
+          if (!response.ok) {
+            throw new Error('文件上传失败');
+          }
+          const data = await response.json();
+          const fileInfo = {
+            extra: name,
+            size: file.size,
+            key: data.url,
+            url: 'attachment/download.do?path=' + data.url,
+            fileType: 'gif',
+            newFile: file.newFile == false ? false : true,
+          };
+          //文件信息保存到单据
+          model.invoke('saveImages', { images: [fileInfo], date: new Date() });
+          console.log('文件上传成功:', fileInfo);
+          return fileInfo;
+        } catch (error) {
+          console.error('文件上传失败:', error);
+          // 处理上传失败后的逻辑
         }
-    };
+      };
+      
 
     // 移除图片
     const onFileDelete = async (file) => {
@@ -72,7 +98,7 @@ export default (props) => {
     };
     const renderDeleteIcon = () => {
         return (
-            <CloseCircleFill style={{ color: '#9999', fontSize: 16, marginLeft: '8px', marginTop: '-8px' }}
+            <CloseCircleFill style={{ color: '#999999', fontSize: 14, marginLeft: '10px', marginTop: '-10px', verticalAlign: 'middle' }}
             />
         );
     };
@@ -96,6 +122,7 @@ export default (props) => {
                 deletable={deletable}
                 onDelete={onFileDelete}
                 showUpload={showUpload}
+                capture="camera"
                 deleteIcon={renderDeleteIcon()}
             >
                 <div
