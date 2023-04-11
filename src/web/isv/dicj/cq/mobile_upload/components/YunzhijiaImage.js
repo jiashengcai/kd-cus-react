@@ -50,7 +50,7 @@ export default (props) => {
 
   //预览图片
   const onPreview = (event) => {
-    let index = files.findIndex((item) => item.fileUid === event.target.id)
+    let index = files.findIndex((item) => item.url === event.target.src)
     viewerRef.current.swipeTo(index);
     //修改preview的值
     setPreview({
@@ -90,9 +90,6 @@ export default (props) => {
                 localId: item,
                 isShowProgressTips: 1,
                 success: function (result2) {
-                  //serverId:xxxx  //服务端文件id
-                  //localId: [xxx] //需要上传的图片的本地ID
-
                   if (result2.success) {
                     const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" + (Math.floor(Math.random() * 90) + 10)
                     const newFile = { url: 'https://yunzhijia.com/openfile/download/media/' + result2.data.serverId, fileUid: fileUid }
@@ -135,14 +132,12 @@ export default (props) => {
     return (
       <div className='adm-space-item' key={index}>
         <div className='adm-image-uploader-cell'>
-          {/* <img src="yzjLocalResource://img?id=xxxxxxx"> */}
           <Image
             className='adm-image adm-image-uploader-cell-image'
-            id={item.fileUid}
             src={item.url}
             width={80} height={80} fit='cover'
             onClick={onPreview}
-            key={`image` + index}
+            key={item.fileUid}
           />
           <span className='adm-image-uploader-delete' style={{
             display: deletable ? 'block' : 'none', position: 'absolute', top: 0,
