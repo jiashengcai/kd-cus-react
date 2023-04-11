@@ -84,23 +84,33 @@ export default (props) => {
       'showOrigin': false,
       'success': function (result) {
         if (result.success) {
-          result.data.localIds.forEach((item) => {
-            qing.call('getLocalImgData', {
-              localId: item,
-              success: function (res) {
-                if (res.success) {
-                  // result.data是base64格式的图片数据
-                  res.data.localData.replaceAll("[^a-zA-Z0-9+/=]", "")
-                  //获取随机文件id
-                  const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" +  (Math.floor(Math.random()*90) + 10)
-                  setFiles([...files, { url: 'data:image/png;base64,' + res.data.localData, fileUid: fileUid }]);
-                  setRefresh(true)
-                  model.invoke('uploadImageBase64', { file: { ...res.data, localId: item, fileUid: fileUid }, date: new Date() });
+          Promise.all(result.data.localIds.map(item => {
+            return new Promise((resolve, reject) => {
+              qing.call('getLocalImgData', {
+                localId: item,
+                success: function (res) {
+                  if (res.success) {
+                    const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" +  (Math.floor(Math.random()*90) + 10)
+                    const newFile = { url: 'data:image/png;base64,' + res.data.localData.replaceAll("[^a-zA-Z0-9+/=]", ""), fileUid: fileUid }
+                    resolve(newFile);
+                    model.invoke('uploadImageBase64', { file: { ...res.data, localId: item, fileUid: fileUid }, date: new Date() });
+                  } else {
+                    reject(res);
+                  }
                 }
-              }
+              });
             });
-            setLoading(false)
+          }))
+          .then(newFiles => {
+            setFiles(prevFiles => [...prevFiles, ...newFiles]);
+            setRefresh(true);
+            setLoading(false);
           })
+          .catch(error => {
+            console.log(error);
+            setLoading(false);
+          });
+  
         }
       }
     });
