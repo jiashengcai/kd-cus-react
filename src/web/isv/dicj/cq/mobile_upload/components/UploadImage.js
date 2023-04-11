@@ -122,7 +122,7 @@ export default (props) => {
                 deletable={deletable}
                 onDelete={onFileDelete}
                 showUpload={showUpload}
-                capture="camera"
+                capture="photo"
                 deleteIcon={renderDeleteIcon()}
             >
                 <div
