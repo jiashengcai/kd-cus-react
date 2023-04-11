@@ -30,7 +30,7 @@ export default (props) => {
   useEffect(() => {
     refresh && setRefresh(false)
   }, [refresh])
-  
+
   const viewerRef = useRef(null);
 
 
@@ -86,31 +86,37 @@ export default (props) => {
         if (result.success) {
           Promise.all(result.data.localIds.map(item => {
             return new Promise((resolve, reject) => {
-              qing.call('getLocalImgData', {
+              qing.call('uploadImage', {
                 localId: item,
-                success: function (res) {
-                  if (res.success) {
-                    const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" +  (Math.floor(Math.random()*90) + 10)
-                    const newFile = { url: 'data:image/png;base64,' + res.data.localData.replaceAll("[^a-zA-Z0-9+/=]", ""), fileUid: fileUid }
+                isShowProgressTips: 1,
+                success: function (result2) {
+                  //serverId:xxxx  //服务端文件id
+                  //localId: [xxx] //需要上传的图片的本地ID
+
+                  if (result2.success) {
+                    const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" + (Math.floor(Math.random() * 90) + 10)
+                    const newFile = { url: 'https://yunzhijia.com/openfile/download/media/' + result2.data.serverId, fileUid: fileUid }
                     resolve(newFile);
-                    model.invoke('uploadImageBase64', { file: { ...res.data, localId: item, fileUid: fileUid }, date: new Date() });
+                    model.invoke('uploadImageYZJ', { file: { ...result2.data, localId: item, fileUid: fileUid }, date: new Date() });
                   } else {
-                    reject(res);
+                    reject(result2);
                   }
+
                 }
               });
             });
           }))
-          .then(newFiles => {
-            setFiles(prevFiles => [...prevFiles, ...newFiles]);
-            setRefresh(true);
-            setLoading(false);
-          })
-          .catch(error => {
-            console.log(error);
-            setLoading(false);
-          });
-  
+            .then(newFiles => {
+              setFiles(prevFiles => [...prevFiles, ...newFiles]);
+              setRefresh(true);
+              setLoading(false);
+            })
+            .catch(error => {
+              alert(JSON.stringify(error));
+              console.log(error);
+              setLoading(false);
+            });
+
         }
       }
     });
