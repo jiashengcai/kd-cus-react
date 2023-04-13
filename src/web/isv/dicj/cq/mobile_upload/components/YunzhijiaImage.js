@@ -18,8 +18,6 @@ export default (props) => {
   const [showUpload, setShowUpload] = useState(true);
   //是否可以删除
   const [deletable, setDeletable] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState(false)
 
   //预览图片
   const [preview, setPreview] = useState({
@@ -27,9 +25,6 @@ export default (props) => {
     defaultIndex: 0,
     images: [],
   })
-  useEffect(() => {
-    refresh && setRefresh(false)
-  }, [refresh])
 
   const viewerRef = useRef(null);
 
@@ -105,13 +100,9 @@ export default (props) => {
           }))
             .then(newFiles => {
               setFiles(prevFiles => [...prevFiles, ...newFiles]);
-              setRefresh(true);
-              setLoading(false);
             })
             .catch(error => {
               alert(JSON.stringify(error));
-              console.log(error);
-              setLoading(false);
             });
 
         }
