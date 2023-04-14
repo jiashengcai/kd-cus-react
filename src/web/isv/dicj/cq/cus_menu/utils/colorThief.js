@@ -38,7 +38,7 @@ export const RGBToHex = (rgb, alpha = 1) => {
   return { rgba, hex };
 };
 
-export const lightenColor = (hexColor, amount = 0, alpha = 0.4) => {
+export const lightenColor = (hexColor, amount = 0, alpha = 0.2) => {
   const rgbColor = hexToRGB(hexColor);
   const lighterColor = rgbColor.map((c) => Math.max(c - amount, 0));
   const { rgba } = RGBToHex(lighterColor, alpha);

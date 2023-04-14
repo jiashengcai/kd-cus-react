@@ -30,7 +30,7 @@ export default (props) => {
             <div className={styles.card_content}>
                 <Avatar
                     size={72}
-                    src="isv/dicj/globalimgs/icons/complaints01.png"
+                    src={data.imageUrl.substring(1)}
                     onLoad={() => {
                         const img = document.querySelector(`.${styles.card_content} img`);
                         getDominantColor(img.src)
