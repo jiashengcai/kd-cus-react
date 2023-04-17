@@ -6,16 +6,16 @@ import { getDominantColor, RGBToHex, lightenColor } from '../utils/colorThief';
 
 import styles from './index.less'
 const spanSize = (titleLength) => {
-  if (titleLength <= 5) {
-    return 4;
-  } else if (titleLength <= 10) {
+  if (titleLength <= 10) {
     return 6;
-  } else if (titleLength <= 15) {
+  } else if (titleLength <= 14) {
     return 8;
-  } else if (titleLength <= 20) {
+  } else if (titleLength <= 18) {
     return 10;
-  } else if (titleLength <= 25) {
+  } else if (titleLength <= 22) {
     return 12;
+  } else if (titleLength <= 26) {
+    return 14;
   } else {
     return 24;
   }
