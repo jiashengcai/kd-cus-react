@@ -2,7 +2,6 @@ import React from 'react'
 import MenuView from './components/MenuView'
 import eventBus from '../../../../../../util/eventBus'
 import 'antd/dist/reset.css';
-import './components/antd.less'
 
 class Root extends React.Component {
     constructor(props) {

@@ -26,9 +26,9 @@ export default (props) => {
     data
   } = props;
   //打开菜单层级记录堆栈
-  const [storeMenu, setStoreMenu] = useState([{ menuList: data.menuList, name: data.appName }]);
+  const [storeMenu, setStoreMenu] = useState([{ menuList: data.menuList, name: data.name }]);
   //当前菜单展示数据
-  const [currentMenu, setCurrentMenu] = useState({ menuList: data.menuList, name: data.appName });
+  const [currentMenu, setCurrentMenu] = useState({ menuList: data.menuList, name: data.name });
   //当前菜单层级
   const [deep, setDeep] = useState(0);
   //更新菜单视图
@@ -50,11 +50,11 @@ export default (props) => {
     const id = findParentId(event.target)
     //根据id查找数据
     const targetMenu = currentMenu.menuList.find(menu => menu.id === id);
-    if (targetMenu?.submenu !== null) {
+    if (targetMenu?.menuList !== null) {
       setDeep((prev) => prev + 1);
       setStoreMenu(prevState => {
         const newState = [...prevState];
-        newState[deep + 1] = { menuList: targetMenu.submenu, name: targetMenu.name };
+        newState[deep + 1] = { menuList: targetMenu.menuList, name: targetMenu.name };
         return newState;
       });
 
@@ -77,8 +77,10 @@ export default (props) => {
     });
 
   }
+  const removeStart = (str) => {
+    return str.startsWith('/') ? str.substring(1) : str;
+  }
 
-  const [bgColor, setBgColor] = useState('');
 
 
   const showMenu = (currentMenu2) => {
@@ -90,19 +92,17 @@ export default (props) => {
           bordered={false}
           className={styles.card_style}
           id={item.id}
-          style={{ backgroundColor: bgColor }}
         >
           <div className={styles.card_content}>
             <Avatar
               size={72}
-              src={item.imageUrl.startsWith("/") ? item.imageUrl.substring(1) : item.imageUrl}
+              src={removeStart(item.imageUrl)}
               onLoad={() => {
-                const img = document.querySelector(`.${styles.card_content} img`);
-                getDominantColor(img.src)
+                getDominantColor(removeStart(item.imageUrl))
                   .then((color) => {
                     const { hex } = RGBToHex(color);
                     const rgbColor = lightenColor(hex);
-                    setBgColor(rgbColor);
+                    document.getElementById(item.id).style.backgroundColor = rgbColor;
                   })
                   .catch((error) => {
                     console.error('Error getting dominant color:', error);

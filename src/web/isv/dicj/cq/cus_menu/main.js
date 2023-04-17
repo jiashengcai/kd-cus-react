@@ -21,6 +21,7 @@ import Root from './App'
             this.model = model
         },
         init: function (props) {
+            hideNav(props.data)
             setHtml(this.model, props)
         },
         update: function (props) {
@@ -40,6 +41,20 @@ import Root from './App'
             ReactDOM.render(<Root model={model} customProps={primaryProps} />, model.dom)
         })
     }
+
+    //非管理员隐藏原有的侧边栏
+    const hideNav = function (data) {
+    if (data.isAdminUser === false) {
+        const elements = document.querySelectorAll('div[id="navigationbar"]');
+        elements.forEach((item) => { 
+          if (item.getAttribute('data-page-id').indexOf(data.appid) > -1) {
+            item.style.display = 'none';
+          }
+        })
+      }
+
+    }
+
 
     // 注册自定义组件
     KDApi.register('cus_menu', MyComponent)
