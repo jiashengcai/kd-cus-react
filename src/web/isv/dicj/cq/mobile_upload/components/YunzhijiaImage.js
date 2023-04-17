@@ -87,7 +87,7 @@ export default (props) => {
                 success: function (result2) {
                   if (result2.success) {
                     const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" + (Math.floor(Math.random() * 90) + 10)
-                    const newFile = { url: 'https://yunzhijia.com/openfile/download/media/' + result2.data.serverId, fileUid: fileUid }
+                    const newFile = { url: propsData.data.yzj_url + result2.data.serverId, fileUid: fileUid }
                     resolve(newFile);
                     model.invoke('uploadImageYZJ', { file: { ...result2.data, localId: item, fileUid: fileUid }, date: new Date() });
                   } else {

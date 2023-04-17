@@ -1,8 +1,8 @@
 import React from 'react'
-import MenuIndex from './components/MenuIndex'
+import MenuView from './components/MenuView'
 import eventBus from '../../../../../../util/eventBus'
 import 'antd/dist/reset.css';
-
+import './components/antd.less'
 
 class Root extends React.Component {
     constructor(props) {
@@ -30,9 +30,9 @@ class Root extends React.Component {
             data
         } = this.state;
         return (
-            <MenuIndex className="App"
+            <MenuView className="App"
                 model={model}
-                data={data}
+                data={data.data}
             />
         )
     }
