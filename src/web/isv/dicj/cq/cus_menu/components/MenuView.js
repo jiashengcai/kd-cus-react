@@ -6,16 +6,10 @@ import { getDominantColor, RGBToHex, lightenColor } from '../utils/colorThief';
 
 import styles from './index.less'
 const spanSize = (titleLength) => {
-  if (titleLength <= 10) {
-    return 6;
-  } else if (titleLength <= 14) {
+  if (titleLength <= 9) {
     return 8;
-  } else if (titleLength <= 18) {
-    return 10;
-  } else if (titleLength <= 22) {
-    return 12;
-  } else if (titleLength <= 26) {
-    return 14;
+  } else if (titleLength <= 23) {
+    return 16;
   } else {
     return 24;
   }
@@ -26,9 +20,9 @@ export default (props) => {
     data
   } = props;
   //打开菜单层级记录堆栈
-  const [storeMenu, setStoreMenu] = useState([{ menuList: data.menuList, name: data.name }]);
+  const [storeMenu, setStoreMenu] = useState([{ menuList: data.menuList, name: data.name, icon: 'icons/pc/entrance/yxy_spflbz_48_48.png' }]);
   //当前菜单展示数据
-  const [currentMenu, setCurrentMenu] = useState({ menuList: data.menuList, name: data.name });
+  const [currentMenu, setCurrentMenu] = useState({ menuList: data.menuList, name: data.name, icon: 'icons/pc/entrance/yxy_spflbz_48_48.png' });
   //当前菜单层级
   const [deep, setDeep] = useState(0);
   //更新菜单视图
@@ -54,7 +48,7 @@ export default (props) => {
       setDeep((prev) => prev + 1);
       setStoreMenu(prevState => {
         const newState = [...prevState];
-        newState[deep + 1] = { menuList: targetMenu.menuList, name: targetMenu.name };
+        newState[deep + 1] = { menuList: targetMenu.menuList, name: targetMenu.name, icon: targetMenu.imageUrl };
         return newState;
       });
 
@@ -120,12 +114,18 @@ export default (props) => {
   return (
     <div className={styles.dicj_menu}>
       <div className={styles.title}>
-        {deep !== 0 ? <Button style={{ marginLeft: 20 }} type="primary" onClick={clickBack}> 返回 </Button> : null}
-        <div className={styles.pre_bolck}></div>
-        <div className={styles.title_text}>{currentMenu.name}</div>
+        <div className={styles.title_left}>
+          <div className={styles.pre_bolck}>
+            <Avatar shape="square" size={52} src={removeStart(currentMenu.icon)}></Avatar>
+          </div>
+          <div className={styles.title_text}>{currentMenu.name}</div>
+        </div>
+        <div className={styles.title_right}>
+          {deep !== 0 ? <Button size='large' style={{color: '#00735C',fontSize:'20px'}} type="text" onClick={clickBack}> 返回 </Button> : null}
+        </div>
       </div>
       <div className={styles.row}>
-        <Row gutter={[19, 30]}>
+        <Row gutter={[40, 40]}>
           {showMenu(currentMenu.menuList)}
         </Row>
       </div>
