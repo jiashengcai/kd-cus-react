@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import eventBus from '../../../../../../util/eventBus'
 import Root from './App'
+import { StyleProvider,legacyLogicalPropertiesTransformer } from '@ant-design/cssinjs';
 
 /**
  * 在setHtml中声明Root类，使用ReactDOM.render将其渲染在model.dom中
@@ -38,7 +39,11 @@ import Root from './App'
         //,'./img/sofa1.jpg','./img/sofa2.jpg','./img/sofa3.jpg','./img/sofa4.jpg','./img/sofa5.jpg'
         const files = ['./css/index.css']
         KDApi.loadFile(files, model, () => {
-            ReactDOM.render(<Root model={model} customProps={primaryProps} />, model.dom)
+            ReactDOM.render(
+            <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+                <Root model={model} customProps={primaryProps} />
+                </StyleProvider>
+                , model.dom)
         })
     }
 
