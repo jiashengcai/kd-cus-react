@@ -34,7 +34,6 @@ import Root from './App'
     }
 
     var setHtml = function (model, primaryProps) {
-        //,'./img/sofa1.jpg','./img/sofa2.jpg','./img/sofa3.jpg','./img/sofa4.jpg','./img/sofa5.jpg'
         const files = ['./css/index.css','./css/style.css','./css/css-vars-patch.css']
         KDApi.loadFile(files, model, () => {
             ReactDOM.render(<Root model={model} customProps={primaryProps} />, model.dom)

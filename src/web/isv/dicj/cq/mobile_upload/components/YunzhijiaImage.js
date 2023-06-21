@@ -12,7 +12,7 @@ export default (props) => {
     model
   } = props;
   const [propsData, setPropsData] = useState(props.data);
-
+  const [entryKey, setEntryKey] = useState("");
   const [files, setFiles] = useState([]);
   //是否可以上传
   const [showUpload, setShowUpload] = useState(true);
@@ -30,14 +30,36 @@ export default (props) => {
 
 
   useEffect(() => {
-    if (propsData?.data != null && propsData.data.images.length > 0) {
+    if (propsData.cardRowData) {
+      //卡片分录数据
+      let data = propsData.cardRowData.cardAllData.dicj_urllargetext_tag;
+      //data 为空跳过
+      if (data && data.length !== 0 && data.includes(',')) {
+        const resultList = data.split(',').map(item => {
+          let url = item.trim();
+          //如果url不包含path=，则加上attachment/preview.do?path=
+          if (!item.includes('path=')) {
+            url = 'attachment/preview.do?path=' + item;
+          }
+          const key = item;
+          return { url, key };
+        });
+        setFiles(resultList)
+      }
+      
+    } else if (propsData.data?.images != null && propsData.data.images.length > 0) {
+      //单据数据
       setFiles(propsData.data.images)
     }
+
+
     //是否可编辑
-    if (propsData?.data != null && propsData.data.edite !== undefined) {
+    if (propsData.data.edite !== undefined) {
       setDeletable(propsData.data.edite)
       setShowUpload(propsData.data.edite)
     }
+    const key = model.metaData?.ci ? model.metaData.ci.find((item) => item.key === 'entry_key') : "";
+    setEntryKey(key?.value);
   }, [propsData]);
 
 
@@ -86,10 +108,10 @@ export default (props) => {
                 isShowProgressTips: 1,
                 success: function (result2) {
                   if (result2.success) {
-                    const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" + (Math.floor(Math.random() * 90) + 10)
+                    const fileUid = "rc-upload-" + Date.parse(new Date()) + "-" + (Math.floor(Math.random() * 90000) + 10000)
                     const newFile = { url: propsData.data.yzj_url + result2.data.serverId, fileUid: fileUid }
                     resolve(newFile);
-                    model.invoke('uploadImageYZJ', { file: { ...result2.data, localId: item, fileUid: fileUid }, date: new Date() });
+                    model.invoke('uploadImageYZJ', { file: { ...result2.data, localId: item, fileUid: fileUid }, date: new Date(), entryKey: entryKey });
                   } else {
                     reject(result2);
                   }
@@ -113,7 +135,7 @@ export default (props) => {
 
   //删除图片
   const handleDeleteImage = (index) => {
-    model.invoke('deleteImages', { file: files[index].fileUid, date: new Date() });
+    model.invoke('deleteImages', { file: files[index].fileUid,...files[index], date: new Date() });
     const newImages = [...files];
     newImages.splice(index, 1);
     setFiles(newImages);
