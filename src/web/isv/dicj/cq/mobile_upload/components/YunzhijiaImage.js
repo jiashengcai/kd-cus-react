@@ -13,6 +13,7 @@ export default (props) => {
   } = props;
   const [propsData, setPropsData] = useState(props.data);
   const [entryKey, setEntryKey] = useState("");
+  const [chooseImageType, setChooseImageType] = useState("photo");
   const [files, setFiles] = useState([]);
   //是否可以上传
   const [showUpload, setShowUpload] = useState(true);
@@ -58,8 +59,10 @@ export default (props) => {
       setDeletable(propsData.data.edite)
       setShowUpload(propsData.data.edite)
     }
-    const key = model.metaData?.ci ? model.metaData.ci.find((item) => item.key === 'entry_key') : "";
-    setEntryKey(key?.value);
+    const entry_key = model.metaData?.ci ? model.metaData.ci.find((item) => item.key === 'entry_key') : "";
+    setEntryKey(entry_key?.value);
+    const iamgeTyep = model.metaData?.ci ? model.metaData.ci.find((item) => item.key === 'chooseImage_type') : "";
+    setChooseImageType(iamgeTyep?.value ? iamgeTyep.value : "photo");
   }, [propsData]);
 
 
@@ -94,7 +97,7 @@ export default (props) => {
    */
   const uploadFile = (event) => {
     qing.call('chooseImage', {
-      'type': 'photo',
+      'type': chooseImageType,//camera
       'needCut': false,
       'isMulti': true,
       'maxSelectCount': 99,
