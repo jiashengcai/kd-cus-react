@@ -24,7 +24,11 @@ export default (props) => {
       //卡片分录数据
       let data = propsData.cardRowData.cardAllData.dicj_urllargetext_tag;
       //data 为空跳过
-      if (data && data.length !== 0 && data.includes(',')) {
+      if (data && data.length !== 0) {
+        //如果data最后一个字符是,则去掉
+        if (data[data.length - 1] === ',') {
+          data = data.substring(0, data.length - 1);
+        }
         const resultList = data.split(',').map(item => {
           let url = item.trim();
           //如果url不包含path=，则加上attachment/preview.do?path=
@@ -59,30 +63,9 @@ export default (props) => {
    */
   const onFileUpload = async (file) => {
     const fileName = file.name;
-    var renameFile = null;
-    if (fileName.toLowerCase().endsWith('.heic')) {
-      try {
-        const resultBlob = await heic2any({
-          blob: file,
-          toType: 'image/jpg',
-        });
-        renameFile = new File([resultBlob], fileName + '.gif', {
-          type: 'image/jpeg',
-          lastModified: new Date().getTime(),
-        });
-      } catch (error) {
-        Toast.hide();
-        return;
-      }
-    } else {
-      const name = fileName.substring(0, fileName.lastIndexOf('.')) + '.gif';
-      var renameFile = new File([file], name, { type: file.type });
-    }
-
-
     const formData = new FormData();
-    formData.append('file', renameFile);
-    formData.append('suffix', '.gif');
+    formData.append('file', file);
+    formData.append('suffix', fileName.substring(fileName.lastIndexOf('.') + 1));
     // 上传图片到文件服务器
     try {
       const response = await fetch('attachment/upload.do', {
@@ -94,11 +77,11 @@ export default (props) => {
       }
       const data = await response.json();
       const fileInfo = {
-        extra: name,
+        extra: fileName,
         size: file.size,
         key: data.url,
         url: 'attachment/preview.do?path=' + data.url,
-        fileType: 'gif',
+        fileType: fileName.substring(fileName.lastIndexOf('.') + 1),
         newFile: file.newFile == false ? false : true,
       };
       //文件信息保存到单据
@@ -139,7 +122,7 @@ export default (props) => {
         value={files}
         style={{ '--cell-size': '80px' }}
         multiple={true}
-        accept="image/jpeg,image/jpg,image/png"
+        accept="image/jpeg,image/jpg,image/png,video/mp4, video/webm, video/ogg"
         upload={onFileUpload}
         onChange={setFiles}
         deletable={deletable}

@@ -35,7 +35,10 @@ export default (props) => {
       //卡片分录数据
       let data = propsData.cardRowData.cardAllData.dicj_urllargetext_tag;
       //data 为空跳过
-      if (data && data.length !== 0 && data.includes(',')) {
+      if (data && data.length !== 0) {
+        if (data[data.length - 1] === ',') {
+          data = data.substring(0, data.length - 1);
+        }
         const resultList = data.split(',').map(item => {
           let url = item.trim();
           //如果url不包含path=，则加上attachment/preview.do?path=
